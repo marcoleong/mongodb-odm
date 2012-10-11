@@ -530,6 +530,10 @@ public function <methodName>()
                 $lines[] = ' * )';
             }
 
+            if ($metadata->lifecycleCallbacks) {
+                $lines[] = ' * @ODM\HasLifecycleCallbacks';
+            }
+
             $methods = array(
                 'generateInheritanceAnnotation',
                 'generateDiscriminatorFieldAnnotation',

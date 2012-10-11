@@ -18,7 +18,7 @@ class MODM47Test extends \Doctrine\ODM\MongoDB\Tests\BaseTest
     }
 }
 
-/** @ODM\Document(db="modm47_test", collection="a") */
+/** @ODM\Document(db="modm47_test", collection="a") @ODM\HasLifecycleCallbacks */
 class MODM47A
 {
     /** @ODM\Id */
