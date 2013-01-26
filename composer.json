@@ -1,5 +1,5 @@
 {
-    "name": "doctrine/mongodb-odm",
+    "name": "marcoleong/mongodb-odm",
     "type": "library",
     "description": "Doctrine MongoDB Object Document Mapper",
     "keywords": ["odm", "database", "persistence", "mongodb"],
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-filter": "1.0.x-dev"
         }
     }
 }
