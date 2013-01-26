@@ -91,10 +91,10 @@ class FilterCollection
             $this->enabledFilters[$name] = is_object($filter)
                 ? $filter
                 : new $filter($this->dm);
+
+            ksort($this->enabledFilters);
         }
         
-        ksort($this->enabledFilters);
-
         return $this->enabledFilters[$name];
     }
 

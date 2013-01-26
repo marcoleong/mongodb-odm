@@ -19,6 +19,7 @@
 
 namespace Doctrine\ODM\MongoDB\Mapping;
 
+use InvalidArgumentException;
 use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\LockException;
 use Doctrine\ODM\MongoDB\Proxy\Proxy;
@@ -68,10 +69,10 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
 
     /**
      * CUSTOM means Doctrine expect a class parameter. It will then try to initiate that class
-     * and pass other options to the generator. It will throw an Exception if the class 
+     * and pass other options to the generator. It will throw an Exception if the class
      * does not exist or if an option was passed for that there is not setter in the new
      * generator class.
-     * 
+     *
      * The class  will have to be a subtype of AbstractIdGenerator.
      */
     const GENERATOR_TYPE_CUSTOM = 5;
@@ -284,6 +285,14 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
      * @var array
      */
     public $fieldMappings = array();
+
+    /**
+     * READ-ONLY: The association mappings of the class.
+     * Keys are field names and values are mapping definitions.
+     *
+     * @var array
+     */
+    public $associationMappings = array();
 
     /**
      * READ-ONLY: Array of fields to also load with a given method.
@@ -956,7 +965,7 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
             $mapping['name'] = $mapping['fieldName'];
         }
         if (isset($this->fieldMappings[$mapping['fieldName']])) {
-            throw MappingException::duplicateFieldMapping($this->name, $mapping['fieldName']);
+            //throw MappingException::duplicateFieldMapping($this->name, $mapping['fieldName']);
         }
         if ($this->discriminatorField['name'] === $mapping['fieldName']) {
             throw MappingException::duplicateFieldMapping($this->name, $mapping['fieldName']);
@@ -1009,12 +1018,18 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
             $mapping['type'] = isset($mapping['type']) ? $mapping['type'] : 'id';
             $this->identifier = $mapping['fieldName'];
             if (isset($mapping['strategy'])) {
+                $this->generatorOptions = isset($mapping['options']) ? $mapping['options'] : array();
+
                 $generatorType = constant('Doctrine\ODM\MongoDB\Mapping\ClassMetadata::GENERATOR_TYPE_' . strtoupper($mapping['strategy']));
                 if ($generatorType !== self::GENERATOR_TYPE_AUTO) {
-                    $mapping['type'] = 'custom_id';
+                    $mapping['type'] = isset($this->generatorOptions['type'])
+                        ? $this->generatorOptions['type']
+                        : 'custom_id';
+
+                    unset($this->generatorOptions['type']);
                 }
+
                 $this->generatorType = $generatorType;
-                $this->generatorOptions = isset($mapping['options']) ? $mapping['options'] : array();
             }
         }
         if ( ! isset($mapping['nullable'])) {
@@ -1032,6 +1047,7 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
         if (isset($mapping['embedded']) && $mapping['type'] === 'many') {
             $mapping['association'] = self::EMBED_MANY;
         }
+
         /*
         if (isset($mapping['type']) && ($mapping['type'] === 'one' || $mapping['type'] === 'many')) {
             $mapping['type'] = $mapping['type'] === 'one' ? self::ONE : self::MANY;
@@ -1057,7 +1073,12 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
                 $mapping['isOwningSide'] = false;
             }
         }
+
         $this->fieldMappings[$mapping['fieldName']] = $mapping;
+        if (isset($mapping['association'])) {
+            $this->associationMappings[$mapping['fieldName']] = $mapping;
+        }
+
         return $mapping;
     }
 
@@ -1603,7 +1624,7 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
      */
     public function getAssociationNames()
     {
-        throw new \BadMethodCallException(__METHOD__.'() is not implemented yet.');
+        return array_keys($this->associationMappings);
     }
 
     /**
@@ -1626,7 +1647,11 @@ class ClassMetadataInfo implements \Doctrine\Common\Persistence\Mapping\ClassMet
      */
     public function getAssociationTargetClass($assocName)
     {
-        throw new \BadMethodCallException(__METHOD__.'($assocName) is not implemented yet.');
+        if ( ! isset($this->associationMappings[$assocName])) {
+            throw new InvalidArgumentException("Association name expected, '" . $assocName ."' is not an association.");
+        }
+
+        return $this->associationMappings[$assocName]['targetDocument'];
     }
 
     /**
