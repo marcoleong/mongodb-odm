@@ -1,5 +1,8 @@
 {
-    "name": "doctrine/mongodb-odm",
+    "name": "marcoleong/mongodb-odm",
+    "replace": {
+        "doctrine/mongodb-odm" : "1.0.x"
+    },
     "type": "library",
     "description": "Doctrine MongoDB Object Document Mapper",
     "keywords": ["odm", "database", "persistence", "mongodb"],
