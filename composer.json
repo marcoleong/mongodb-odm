@@ -1,7 +1,7 @@
 {
     "name": "marcoleong/mongodb-odm",
     "replace" : {
-        "doctrine/mongodb-odm": "dev-master"
+        "doctrine/mongodb-odm": "1.0.x"
     },
     "type": "library",
     "description": "Doctrine MongoDB Object Document Mapper",
