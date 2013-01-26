@@ -1,5 +1,8 @@
 {
     "name": "marcoleong/mongodb-odm",
+    "replace" : {
+        "doctrine/mongodb-odm": "dev-master"
+    },
     "type": "library",
     "description": "Doctrine MongoDB Object Document Mapper",
     "keywords": ["odm", "database", "persistence", "mongodb"],
