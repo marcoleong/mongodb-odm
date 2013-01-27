@@ -356,8 +356,8 @@ class Configuration extends \Doctrine\MongoDB\Configuration
                 " instance of '" . get_class($filter) . "' given."
             );
         }
-        
-        $this->_attributes['filters'][$name] = $filter;
+
+        $this->attributes['filters'][$name] = $filter;
     }
 
     /**
